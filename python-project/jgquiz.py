@@ -58,7 +58,7 @@ randomizer = []
 ### ----Fuction Section----
 
 #This Fuctions takes user input, question string, and returns the combined string.
-#All Blanks must me '_____' for this to work right.
+#All Blanks must be '_____' for this to work right.
 def fillBlank(userstring,question):
     replaced = question.replace("_____",userstring)
     return replaced
@@ -71,15 +71,15 @@ def select():
     inputGood = False
     while not inputGood:
         print "*** Select Level easy, medium, or hard: "
-        l = raw_input()
-        if l in acceptableChar:
+        level = raw_input()
+        if level in acceptableChar:
             inputGood = True
-    quiz.update(level_names[l])
-    if l == 'easy':
+    quiz.update(level_names[level])
+    if level == 'easy':
         return "2000s"
-    if l == 'medium':
+    if level == 'medium':
         return "90s"
-    if l == 'hard':
+    if level == 'hard':
         return '80s'
 
 
@@ -94,12 +94,13 @@ def makeRandom(q_list):
 #User Input should be at least 4 characters.
 def inputcheck(input):
     #Letters and spaces are only good input.
-    s = input.lower()
-    if len(s) < 4:
+    userInput = input.lower()
+    minInputLength = 4
+    if len(userInput) < minInputLength:
         return False
     charset = string.ascii_lowercase + "    "
-    for c in s:
-        if c not in charset:
+    for character in userInput:
+        if character not in charset:
             return False
     return True
 
@@ -116,39 +117,32 @@ def gradeQuestion(reply,qid):
 ##Sets "Game Over" condition (Return False) after three wrong answers.
 #Tested and works as Expected.
 def askquestion(qid):
+    maximumStrikes = 3
     tries = 0
     isCorrect = False
     while not isCorrect:
         #Input Validation.
         isGood = False
         while not isGood:
-            print "*** "
-            print "*** Fill The Blank:"
-            print "*** " + quiz[qid]['q']
-            print "Answer: "
+            print "*** " + "\n" + "*** Fill The Blank:" + "\n" + "*** " + quiz[qid]['q'] + "\n" + "Answer: "
             reply = raw_input()
             if inputcheck(reply):
                 isGood = True
             else:
-                print "*** Letters only"
-                print "*** at Least four characters"
+                print "*** Letters only and at Least four characters"
         #Correct Answer Condition
         if gradeQuestion(reply,qid):
             isCorrect = True
             score.append("correct")
-            #Will add this later
-            print "*** "
-            print "*** Your Answer:"
-            print "*** " + fillBlank(reply,quiz[qid]['q']) + " from " + qid
+            print "*** " + "\n" + "*** Your Answer:" + "\n" + "*** " + fillBlank(reply,quiz[qid]['q']) + " from " + qid
             return True
         #Wrong answer entered. Loop begins agian. Tries iterates.
         else:
             tries += 1
-            print "***"
-            print "*** Try Again... Strike: ",tries
+            print "***" + "\n" + "*** Try Again... Strike: ",tries
         #Returns 'False' if Three Tries attempted.
         #This is the Game Over Condition.
-        if tries == 3:
+        if tries == maximumStrikes:
             print "***"
             return False
 
@@ -156,16 +150,19 @@ def askquestion(qid):
 #Loops through questions.
 #Returns game over if game over.
 def questionLooper(randomizer):
-    while len(randomizer) > 0:
+    #added 'Loopempty' to avoid magic number
+    listEmpty = 0
+    while len(randomizer) > listEmpty: # i.e. 'as long as the list isn't empty...'
         index = randint(0,len(randomizer)-1)
         nextq = randomizer.pop(index)
         #Asks question. Checks for correct answer.
         #Checks for Game Over condition is met.
+        #Item is removed from list as the loop moves on
         if not askquestion(nextq):
             print "*** Game Over."
             break
         else:
-            if len(randomizer) > 0:
+            if len(randomizer) > listEmpty: # i.e. 'as long as the list isn't empty...'
                 print "***"
                 print "*** Good job! Next Question..."
 
@@ -184,7 +181,8 @@ def run_quiz():
     #Run The ask Questions Loop
     questionLooper(randomizer)
     #quizfeedback
-    if len(score) == 5:
+    winningScore = len(quiz) #Winning score is always 100%
+    if len(score) == winningScore:
         print "***"
         print "***Great job, you really know your "+ decade +" movies!!"
     else:
