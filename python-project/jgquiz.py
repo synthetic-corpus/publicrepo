@@ -11,7 +11,7 @@ import string
 ## Contians lists, dictionaries etc, that will be manipulated by functions
 ## Most will be constant throughought the running of the functions.
 
-#Giant Dictionary below. Contains question id (aka 'qid'), question text, answers etc
+#Giant Dictionary below. Contains question id (aka 'question_id'), question text, answers etc
 #Quizlist Data Sturcture:
 #     {question ID :{question and answer}}
 #Question and Answer data Structure:
@@ -77,16 +77,16 @@ def select():
     quiz.update(level_names[level])
     if level == 'easy':
         return "2000s"
-    if level == 'medium':
+    elif level == 'medium':
         return "90s"
-    if level == 'hard':
+    elif level == 'hard':
         return '80s'
 
 
 #Use to present the quiz question in a random order.
-def makeRandom(q_list):
-    for e in q_list:
-        randomizer.append(e)
+def makeRandom(question_list):
+    for question_id in question_list:
+        randomizer.append(question_id)
 
 #This is an input check.
 #Will return True or False.
@@ -105,10 +105,10 @@ def inputcheck(input):
     return True
 
 #Grades the user answers.
-def gradeQuestion(reply,qid):
+def gradeQuestion(reply,question_id):
     #Extra search strings to allow for more flexible written answers.
     #Grade Question Needs to Return True or False only.
-    answers = quiz[qid]['a']
+    answers = quiz[question_id]['a']
     if reply.lower() in answers:
         return True
     return False
@@ -116,7 +116,7 @@ def gradeQuestion(reply,qid):
 ## This asks a question, checks with gradeQuestion().
 ##Sets "Game Over" condition (Return False) after three wrong answers.
 #Tested and works as Expected.
-def askquestion(qid):
+def askquestion(question_id):
     maximumStrikes = 3
     tries = 0
     isCorrect = False
@@ -124,17 +124,17 @@ def askquestion(qid):
         #Input Validation.
         isGood = False
         while not isGood:
-            print "*** " + "\n" + "*** Fill The Blank:" + "\n" + "*** " + quiz[qid]['q'] + "\n" + "Answer: "
+            print "*** " + "\n" + "*** Fill The Blank:" + "\n" + "*** " + quiz[question_id]['q'] + "\n" + "Answer: "
             reply = raw_input()
             if inputcheck(reply):
                 isGood = True
             else:
                 print "*** Letters only and at Least four characters"
         #Correct Answer Condition
-        if gradeQuestion(reply,qid):
+        if gradeQuestion(reply,question_id):
             isCorrect = True
             score.append("correct")
-            print "*** " + "\n" + "*** Your Answer:" + "\n" + "*** " + fillBlank(reply,quiz[qid]['q']) + " from " + qid
+            print "*** " + "\n" + "*** Your Answer:" + "\n" + "*** " + fillBlank(reply,quiz[question_id]['q']) + " from " + question_id
             return True
         #Wrong answer entered. Loop begins agian. Tries iterates.
         else:
@@ -154,11 +154,11 @@ def questionLooper(randomizer):
     listEmpty = 0
     while len(randomizer) > listEmpty: # i.e. 'as long as the list isn't empty...'
         index = randint(0,len(randomizer)-1)
-        nextq = randomizer.pop(index)
+        next_question = randomizer.pop(index)
         #Asks question. Checks for correct answer.
         #Checks for Game Over condition is met.
         #Item is removed from list as the loop moves on
-        if not askquestion(nextq):
+        if not askquestion(next_question):
             print "*** Game Over."
             break
         else:
